@@ -11,6 +11,11 @@ Route::get('/', function () {
     return redirect()->route('admin.login');
 });
 
+// Alias agar middleware auth bawaan Laravel tidak error "Route [login] not defined"
+Route::get('/login', function () {
+    return redirect()->route('admin.login');
+})->name('login');
+
 Route::prefix('admin')->name('admin.')->group(function () {
     Route::middleware('guest')->group(function () {
         Route::get('login', [AuthController::class, 'showLogin'])->name('login');

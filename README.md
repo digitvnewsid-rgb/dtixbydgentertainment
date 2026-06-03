@@ -41,16 +41,30 @@ chmod +x setup.sh
 php artisan serve
 ```
 
+## Layar putih / tidak bisa masuk website?
+
+1. **Jangan** buka folder project langsung di browser (XAMPP/Laragon harus mengarah ke folder **`public`**, atau pakai `php artisan serve`).
+2. Jalankan perbaikan otomatis:
+   ```bash
+   composer install
+   php artisan dtix:setup
+   php artisan serve
+   ```
+3. Buka diagnosa: http://127.0.0.1:8000/cek-setup.php — semua baris harus **OK**.
+4. Baru buka login: http://127.0.0.1:8000/admin/login
+
+Penyebab paling sering: belum `composer install`, belum `migrate`, atau `SESSION_DRIVER=database` di `.env` tanpa tabel (sudah diperbaiki di `.env.example` baru).
+
 ## Masalah umum
 
 | Gejala | Penyebab | Solusi |
 |--------|----------|--------|
-| Repo hanya `README.md` | Clone lama sebelum merge ke `main` | `git pull origin main` — kode ada di branch **main** |
+| Layar putih / HTTP 500 | DB belum migrate, vendor kosong, APP_KEY kosong | `php artisan dtix:setup` |
+| Repo hanya `README.md` | Clone lama | `git pull origin main` |
 | `php: command not found` | PHP belum terpasang | Install PHP 8.3+ |
-| `artisan` tidak ada | Belum `composer install` / folder salah | Pastikan di root project setelah clone |
-| Error database | File SQLite belum dibuat | `touch database/database.sqlite` lalu `php artisan migrate --seed` |
-| Login ditolak | Pakai akun customer | Hanya **admin@dtix.test** untuk panel admin |
-| Halaman kosong / 500 | `.env` belum ada | `cp .env.example .env` dan `php artisan key:generate` |
+| `artisan` tidak ada | Belum `composer install` | `composer install` |
+| XAMPP/Laragon blank | Document root salah | Arahkan ke folder **`public`** |
+| Login ditolak | Bukan akun admin | **admin@dtix.test** / `password` |
 
 ## Modul admin
 

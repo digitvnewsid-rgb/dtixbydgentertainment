@@ -15,19 +15,27 @@ class DatabaseSeeder extends Seeder
 
     public function run(): void
     {
-        User::factory()->create([
-            'name' => 'Admin DTIX',
-            'email' => 'admin@dtix.test',
-            'password' => 'password',
-            'role' => 'admin',
-        ]);
+        if (! User::query()->where('email', 'admin@dtix.test')->exists()) {
+            User::factory()->create([
+                'name' => 'Admin DTIX',
+                'email' => 'admin@dtix.test',
+                'password' => 'password',
+                'role' => 'admin',
+            ]);
+        }
 
-        User::factory()->create([
-            'name' => 'Customer Demo',
-            'email' => 'customer@dtix.test',
-            'password' => 'password',
-            'role' => 'customer',
-        ]);
+        if (! User::query()->where('email', 'customer@dtix.test')->exists()) {
+            User::factory()->create([
+                'name' => 'Customer Demo',
+                'email' => 'customer@dtix.test',
+                'password' => 'password',
+                'role' => 'customer',
+            ]);
+        }
+
+        if (EventCategory::query()->exists()) {
+            return;
+        }
 
         $music = EventCategory::create([
             'name' => 'Musik',

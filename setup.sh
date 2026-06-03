@@ -19,18 +19,26 @@ composer install --no-interaction --prefer-dist
 if [ ! -f .env ]; then
   echo "==> membuat .env"
   cp .env.example .env
-  php artisan key:generate --ansi
 fi
 
-if [ ! -f database/database.sqlite ]; then
-  echo "==> membuat database SQLite"
-  touch database/database.sqlite
+# Pakai session/cache file agar tidak error 500 sebelum migrate
+if grep -q '^SESSION_DRIVER=database' .env 2>/dev/null; then
+  sed -i 's/^SESSION_DRIVER=database/SESSION_DRIVER=file/' .env
+fi
+if grep -q '^CACHE_STORE=database' .env 2>/dev/null; then
+  sed -i 's/^CACHE_STORE=database/CACHE_STORE=file/' .env
+fi
+if grep -q '^QUEUE_CONNECTION=database' .env 2>/dev/null; then
+  sed -i 's/^QUEUE_CONNECTION=database/QUEUE_CONNECTION=sync/' .env
 fi
 
-echo "==> migrate & seed"
-php artisan migrate --seed --force
+chmod -R 775 storage bootstrap/cache 2>/dev/null || true
+
+echo "==> php artisan dtix:setup"
+php artisan dtix:setup
 
 echo ""
 echo "Selesai. Jalankan: php artisan serve"
-echo "Login admin: admin@dtix.test / password"
-echo "URL: http://127.0.0.1:8000/admin/login"
+echo "Cek diagnosa: http://127.0.0.1:8000/cek-setup.php"
+echo "Login admin: http://127.0.0.1:8000/admin/login"
+echo "Email: admin@dtix.test  Password: password"
