@@ -2,14 +2,15 @@
 
 namespace Tests\Feature;
 
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class ExampleTest extends TestCase
 {
-    public function test_home_redirects_to_admin_login(): void
-    {
-        $response = $this->get('/');
+    use RefreshDatabase;
 
-        $response->assertRedirect(route('admin.login'));
+    public function test_home_page_is_accessible(): void
+    {
+        $this->get(route('home'))->assertOk();
     }
 }

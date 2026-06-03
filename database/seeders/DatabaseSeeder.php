@@ -2,113 +2,82 @@
 
 namespace Database\Seeders;
 
+use App\Enums\EventStatus;
+use App\Enums\UserRole;
+use App\Models\Category;
 use App\Models\Event;
-use App\Models\EventCategory;
-use App\Models\TicketType;
 use App\Models\User;
-use App\Models\Venue;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
+
 class DatabaseSeeder extends Seeder
 {
-    use WithoutModelEvents;
-
     public function run(): void
     {
-        if (! User::query()->where('email', 'admin@dtix.test')->exists()) {
-            User::factory()->create([
-                'name' => 'Admin DTIX',
-                'email' => 'admin@dtix.test',
-                'password' => 'password',
-                'role' => 'admin',
-            ]);
-        }
+        User::firstOrCreate(
+            ['email' => 'admin@etms.test'],
+            [
+                'name' => 'Super Admin',
+                'phone' => '08000000001',
+                'password' => Hash::make('password'),
+                'role' => UserRole::Administrator,
+                'is_active' => true,
+            ]
+        );
 
-        if (! User::query()->where('email', 'customer@dtix.test')->exists()) {
-            User::factory()->create([
+        $creator = User::firstOrCreate(
+            ['email' => 'creator@etms.test'],
+            [
+                'name' => 'Event Creator',
+                'phone' => '08000000002',
+                'password' => Hash::make('password'),
+                'role' => UserRole::Creator,
+                'is_active' => true,
+            ]
+        );
+
+        User::firstOrCreate(
+            ['email' => 'customer@etms.test'],
+            [
                 'name' => 'Customer Demo',
-                'email' => 'customer@dtix.test',
-                'password' => 'password',
-                'role' => 'customer',
-            ]);
-        }
+                'phone' => '08000000003',
+                'password' => Hash::make('password'),
+                'role' => UserRole::Customer,
+                'is_active' => true,
+            ]
+        );
 
-        if (EventCategory::query()->exists()) {
-            return;
-        }
+        $ticketing = User::firstOrCreate(
+            ['email' => 'ticketing@etms.test'],
+            [
+                'name' => 'Petugas Gate',
+                'phone' => '08000000004',
+                'password' => Hash::make('password'),
+                'role' => UserRole::Ticketing,
+                'is_active' => true,
+            ]
+        );
 
-        $music = EventCategory::create([
-            'name' => 'Musik',
-            'slug' => 'musik',
-            'description' => 'Konser dan festival musik',
-            'is_active' => true,
-        ]);
+        $category = Category::firstOrCreate(
+            ['slug' => 'musik'],
+            ['name' => 'Musik', 'description' => 'Konser & festival', 'is_active' => true]
+        );
 
-        $theater = EventCategory::create([
-            'name' => 'Teater',
-            'slug' => 'teater',
-            'description' => 'Pertunjukan teater dan drama',
-            'is_active' => true,
-        ]);
+        $event = Event::firstOrCreate(
+            ['slug' => 'summer-fest-2026'],
+            [
+                'creator_id' => $creator->id,
+                'category_id' => $category->id,
+                'title' => 'Summer Fest 2026',
+                'description' => 'Event demo untuk pengujian sistem.',
+                'location' => 'Jakarta International Expo',
+                'map_url' => 'https://maps.google.com',
+                'start_datetime' => now()->addMonths(2),
+                'end_datetime' => now()->addMonths(2)->addHours(6),
+                'status' => EventStatus::Published,
+            ]
+        );
 
-        $gbk = Venue::create([
-            'name' => 'Gelora Bung Karno',
-            'slug' => 'gelora-bung-karno',
-            'address' => 'Jl. Pintu Satu Senayan',
-            'city' => 'Jakarta',
-            'capacity' => 80000,
-            'description' => 'Stadion utama Jakarta',
-            'is_active' => true,
-        ]);
-
-        $taman = Venue::create([
-            'name' => 'Taman Ismail Marzuki',
-            'slug' => 'taman-ismail-marzuki',
-            'address' => 'Jl. Cikini Raya No. 73',
-            'city' => 'Jakarta',
-            'capacity' => 1200,
-            'description' => 'Pusat kesenian Jakarta',
-            'is_active' => true,
-        ]);
-
-        $concert = Event::create([
-            'event_category_id' => $music->id,
-            'venue_id' => $gbk->id,
-            'title' => 'DTIX Music Festival 2026',
-            'slug' => 'dtix-music-festival-2026',
-            'description' => 'Festival musik tahunan BYDG Entertainment',
-            'start_at' => now()->addMonths(2),
-            'end_at' => now()->addMonths(2)->addHours(5),
-            'status' => 'published',
-        ]);
-
-        $play = Event::create([
-            'event_category_id' => $theater->id,
-            'venue_id' => $taman->id,
-            'title' => 'Drama Nusantara',
-            'slug' => 'drama-nusantara',
-            'description' => 'Pertunjukan teater musikal',
-            'start_at' => now()->addMonth(),
-            'end_at' => now()->addMonth()->addHours(2),
-            'status' => 'draft',
-        ]);
-
-        TicketType::create([
-            'event_id' => $concert->id,
-            'name' => 'Festival Pass',
-            'price' => 750000,
-            'quota' => 5000,
-            'sold_count' => 120,
-            'is_active' => true,
-        ]);
-
-        TicketType::create([
-            'event_id' => $concert->id,
-            'name' => 'VIP',
-            'price' => 1500000,
-            'quota' => 500,
-            'sold_count' => 45,
-            'is_active' => true,
-        ]);
+        $event->ticketingStaff()->syncWithoutDetaching([$ticketing->id]);
     }
 }

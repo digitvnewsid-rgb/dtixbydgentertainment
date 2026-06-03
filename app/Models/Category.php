@@ -5,14 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class Venue extends Model
+class Category extends Model
 {
     protected $fillable = [
         'name',
         'slug',
-        'address',
-        'city',
-        'capacity',
         'description',
         'is_active',
     ];
@@ -20,7 +17,6 @@ class Venue extends Model
     protected function casts(): array
     {
         return [
-            'capacity' => 'integer',
             'is_active' => 'boolean',
         ];
     }

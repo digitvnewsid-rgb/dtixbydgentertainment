@@ -2,44 +2,79 @@
 
 namespace App\Models;
 
+use App\Enums\EventStatus;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Event extends Model
 {
+    use SoftDeletes;
+
     protected $fillable = [
-        'event_category_id',
-        'venue_id',
+        'creator_id',
+        'category_id',
         'title',
         'slug',
         'description',
-        'start_at',
-        'end_at',
+        'banner',
+        'location',
+        'map_url',
+        'start_datetime',
+        'end_datetime',
         'status',
-        'poster_url',
     ];
 
     protected function casts(): array
     {
         return [
-            'start_at' => 'datetime',
-            'end_at' => 'datetime',
+            'start_datetime' => 'datetime',
+            'end_datetime' => 'datetime',
+            'status' => EventStatus::class,
         ];
+    }
+
+    public function creator(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'creator_id');
     }
 
     public function category(): BelongsTo
     {
-        return $this->belongsTo(EventCategory::class, 'event_category_id');
-    }
-
-    public function venue(): BelongsTo
-    {
-        return $this->belongsTo(Venue::class);
+        return $this->belongsTo(Category::class);
     }
 
     public function ticketTypes(): HasMany
     {
         return $this->hasMany(TicketType::class);
+    }
+
+    public function orders(): HasMany
+    {
+        return $this->hasMany(Order::class);
+    }
+
+    public function tickets(): HasMany
+    {
+        return $this->hasMany(Ticket::class);
+    }
+
+    public function ticketingStaff(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'event_ticketing_staff')
+            ->withTimestamps();
+    }
+
+    public function isPublished(): bool
+    {
+        return $this->status === EventStatus::Published;
+    }
+
+    public function isPurchasable(): bool
+    {
+        return $this->status === EventStatus::Published
+            && $this->end_datetime->isFuture();
     }
 }
