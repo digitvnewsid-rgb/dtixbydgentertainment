@@ -23,6 +23,9 @@
                         <h3 class="mt-1 font-semibold">{{ $event->title }}</h3>
                         <p class="mt-2 text-sm text-slate-500">{{ $event->location }}</p>
                         <p class="text-sm text-slate-500">{{ $event->start_datetime->format('d M Y H:i') }}</p>
+                        @if ($event->ticketTypes->isNotEmpty())
+                            <p class="mt-2 text-sm font-medium text-indigo-600">Mulai Rp {{ number_format($event->ticketTypes->min('price')) }}</p>
+                        @endif
                     </div>
                 </article>
             @endforeach

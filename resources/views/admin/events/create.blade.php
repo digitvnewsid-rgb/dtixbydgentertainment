@@ -1,11 +1,13 @@
-@extends('layouts.admin')
-@section('title', 'Tambah Acara')
+@extends('layouts.dashboard')
+@section('page_title', 'Tambah Event')
+@section('sidebar')
+    @include('partials.sidebar-link', ['href' => route('admin.events.index'), 'label' => 'Event', 'active' => true])
+@endsection
 @section('content')
-<h2 class="mb-3">Tambah Acara</h2>
-<div class="card shadow-sm"><div class="card-body">
-<form method="POST" action="{{ route('admin.events.store') }}">@csrf
-@include('admin.events._form')
-<button class="btn btn-primary">Simpan</button>
-<a href="{{ route('admin.events.index') }}" class="btn btn-link">Batal</a>
-</form></div></div>
+<div class="max-w-3xl rounded-xl border bg-white p-6">
+    <form method="POST" action="{{ route('admin.events.store') }}" enctype="multipart/form-data" class="space-y-4">@csrf
+        @include('partials.event-form', ['showCreator' => true])
+        <button class="rounded-lg bg-indigo-600 px-4 py-2 text-white">Simpan</button>
+    </form>
+</div>
 @endsection

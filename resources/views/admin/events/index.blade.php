@@ -1,37 +1,27 @@
-@extends('layouts.admin')
-@section('title', 'Acara')
+@extends('layouts.dashboard')
+@section('page_title', 'Kelola Event')
+@section('sidebar')
+    @include('partials.sidebar-link', ['href' => route('admin.dashboard'), 'label' => 'Dashboard'])
+    @include('partials.sidebar-link', ['href' => route('admin.categories.index'), 'label' => 'Kategori'])
+    @include('partials.sidebar-link', ['href' => route('admin.events.index'), 'label' => 'Event', 'active' => true])
+    @include('partials.sidebar-link', ['href' => route('admin.users.index'), 'label' => 'User'])
+@endsection
 @section('content')
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h2>Daftar Acara</h2>
-    <a href="{{ route('admin.events.create') }}" class="btn btn-primary">Tambah Acara</a>
+<div class="mb-4 flex justify-end"><a href="{{ route('admin.events.create') }}" class="rounded-lg bg-indigo-600 px-4 py-2 text-sm text-white">Tambah Event</a></div>
+@include('partials.event-filters')
+<div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+@foreach ($events as $event)
+    <article class="rounded-xl border bg-white p-4 shadow-sm">
+        <div class="mb-2 flex justify-between">
+            @include('partials.status-badge', ['status' => $event->status->value])
+            <span class="text-xs text-slate-500">{{ $event->ticket_types_count }} jenis tiket</span>
+        </div>
+        <h3 class="font-semibold">{{ $event->title }}</h3>
+        <p class="text-sm text-slate-500">{{ $event->location }}</p>
+        <p class="text-xs text-slate-400">{{ $event->start_datetime->format('d M Y H:i') }} · {{ $event->creator->name }}</p>
+        <a href="{{ route('admin.events.show', $event) }}" class="mt-3 inline-block text-sm text-indigo-600">Detail →</a>
+    </article>
+@endforeach
 </div>
-<div class="card shadow-sm">
-    <div class="table-responsive">
-        <table class="table table-hover mb-0">
-            <thead><tr><th>Judul</th><th>Kategori</th><th>Venue</th><th>Jadwal</th><th>Status</th><th></th></tr></thead>
-            <tbody>
-            @forelse ($events as $event)
-                <tr>
-                    <td>{{ $event->title }}</td>
-                    <td>{{ $event->category->name }}</td>
-                    <td>{{ $event->venue->name }}</td>
-                    <td>{{ $event->start_at->format('d M Y H:i') }}</td>
-                    <td><span class="badge bg-secondary">{{ $event->status }}</span></td>
-                    <td class="text-end">
-                        <a href="{{ route('admin.events.show', $event) }}" class="btn btn-sm btn-outline-secondary">Detail</a>
-                        <a href="{{ route('admin.events.edit', $event) }}" class="btn btn-sm btn-outline-primary">Edit</a>
-                        <form action="{{ route('admin.events.destroy', $event) }}" method="POST" class="d-inline" onsubmit="return confirm('Hapus acara ini?')">
-                            @csrf @method('DELETE')
-                            <button class="btn btn-sm btn-outline-danger">Hapus</button>
-                        </form>
-                    </td>
-                </tr>
-            @empty
-                <tr><td colspan="6" class="text-center text-muted py-4">Belum ada acara.</td></tr>
-            @endforelse
-            </tbody>
-        </table>
-    </div>
-</div>
-{{ $events->links() }}
+<div class="mt-4">{{ $events->links() }}</div>
 @endsection

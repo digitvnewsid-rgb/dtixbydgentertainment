@@ -73,8 +73,8 @@ Ticketing → scan QR → validasi + lock row → status used (tidak bisa scan l
 
 | Tahap | Scope |
 |-------|--------|
-| **1** | Setup, MySQL, auth, role middleware, layout dashboard |
-| **2** | Event, category, ticket type (creator + admin) |
+| **1** | Selesai — Setup, MySQL, auth, role middleware, layout dashboard |
+| **2** | Selesai — Event, category, ticket type (creator + admin) |
 | **3** | Public pages, checkout, order, payment manual |
 | **4** | Generate ticket, QR, e-ticket |
 | **5** | Scan QR, anti double-scan |

@@ -7,7 +7,7 @@ Platform penjualan tiket event (konsep mirip Loket.com) — Laravel 13 + MySQL +
 | Tahap | Status | Isi |
 |-------|--------|-----|
 | **1** | Selesai | Auth 4 role, middleware, layout dashboard, admin kelola user |
-| 2 | Rencana | Event, kategori, jenis tiket (creator + admin) |
+| **2** | Selesai | Kategori (admin), Event CRUD, jenis tiket, publish/close, filter |
 | 3 | Rencana | Halaman publik, checkout, order, pembayaran manual |
 | 4 | Rencana | Generate tiket, QR Code, e-ticket |
 | 5 | Rencana | Scan QR, anti double-scan |
@@ -65,18 +65,18 @@ Buka http://127.0.0.1:8000
 
 Customer baru dapat **register** di `/register`.
 
-## Route penting (Tahap 1)
+## Route penting
 
 | URL | Role |
 |-----|------|
-| `/` | Public homepage |
-| `/login` | Semua role |
-| `/register` | Customer |
-| `/admin/dashboard` | Administrator |
-| `/admin/users` | Administrator — CRUD user |
-| `/creator/dashboard` | Creator |
-| `/customer/dashboard` | Customer |
-| `/ticketing/dashboard` | Ticketing |
+| `/` | Public — event published |
+| `/login`, `/register` | Auth |
+| `/admin/categories` | Admin — kategori |
+| `/admin/events` | Admin — semua event + publish/close/cancel |
+| `/admin/events/{event}/ticket-types` | Admin — jenis tiket |
+| `/creator/events` | Creator — event milik sendiri |
+| `/creator/events/{event}/ticket-types` | Creator — jenis tiket |
+| `/admin/users` | Admin — kelola user |
 
 ## Tes
 

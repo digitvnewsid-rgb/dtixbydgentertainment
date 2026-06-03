@@ -1,36 +1,35 @@
-@extends('layouts.admin')
-@section('title', 'Kategori Event')
+@extends('layouts.dashboard')
+@section('title', 'Kategori')
+@section('page_title', 'Kategori Event')
+@section('sidebar')
+    @include('partials.sidebar-link', ['href' => route('admin.dashboard'), 'label' => 'Dashboard'])
+    @include('partials.sidebar-link', ['href' => route('admin.categories.index'), 'label' => 'Kategori', 'active' => true])
+    @include('partials.sidebar-link', ['href' => route('admin.events.index'), 'label' => 'Event'])
+    @include('partials.sidebar-link', ['href' => route('admin.users.index'), 'label' => 'User'])
+@endsection
 @section('content')
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h2>Kategori Event</h2>
-    <a href="{{ route('admin.categories.create') }}" class="btn btn-primary">Tambah Kategori</a>
+<div class="mb-4 flex justify-end">
+    <a href="{{ route('admin.categories.create') }}" class="rounded-lg bg-indigo-600 px-4 py-2 text-sm text-white">Tambah Kategori</a>
 </div>
-<div class="card shadow-sm">
-    <div class="table-responsive">
-        <table class="table table-hover mb-0">
-            <thead><tr><th>Nama</th><th>Slug</th><th>Acara</th><th>Status</th><th></th></tr></thead>
-            <tbody>
-            @forelse ($categories as $category)
-                <tr>
-                    <td>{{ $category->name }}</td>
-                    <td><code>{{ $category->slug }}</code></td>
-                    <td>{{ $category->events_count }}</td>
-                    <td><span class="badge bg-{{ $category->is_active ? 'success' : 'secondary' }}">{{ $category->is_active ? 'Aktif' : 'Nonaktif' }}</span></td>
-                    <td class="text-end">
-                        <a href="{{ route('admin.categories.show', $category) }}" class="btn btn-sm btn-outline-secondary">Detail</a>
-                        <a href="{{ route('admin.categories.edit', $category) }}" class="btn btn-sm btn-outline-primary">Edit</a>
-                        <form action="{{ route('admin.categories.destroy', $category) }}" method="POST" class="d-inline" onsubmit="return confirm('Hapus kategori ini?')">
-                            @csrf @method('DELETE')
-                            <button class="btn btn-sm btn-outline-danger">Hapus</button>
-                        </form>
-                    </td>
-                </tr>
-            @empty
-                <tr><td colspan="5" class="text-center text-muted py-4">Belum ada kategori.</td></tr>
-            @endforelse
-            </tbody>
-        </table>
-    </div>
+<div class="overflow-hidden rounded-xl border bg-white shadow-sm">
+    <table class="min-w-full text-sm">
+        <thead class="bg-slate-50 text-left"><tr><th class="px-4 py-3">Nama</th><th>Event</th><th>Status</th><th></th></tr></thead>
+        <tbody>
+        @foreach ($categories as $category)
+            <tr class="border-t">
+                <td class="px-4 py-3 font-medium">{{ $category->name }}</td>
+                <td class="px-4 py-3">{{ $category->events_count }}</td>
+                <td class="px-4 py-3">@include('partials.status-badge', ['status' => $category->is_active ? 'active' : 'inactive'])</td>
+                <td class="px-4 py-3 text-right">
+                    <a href="{{ route('admin.categories.edit', $category) }}" class="text-indigo-600">Edit</a>
+                    <form action="{{ route('admin.categories.destroy', $category) }}" method="POST" class="inline" onsubmit="return confirm('Hapus?')">@csrf @method('DELETE')
+                        <button class="text-red-600">Hapus</button>
+                    </form>
+                </td>
+            </tr>
+        @endforeach
+        </tbody>
+    </table>
 </div>
 {{ $categories->links() }}
 @endsection

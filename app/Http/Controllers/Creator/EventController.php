@@ -1,15 +1,13 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\Creator;
 
 use App\Enums\EventStatus;
-use App\Enums\UserRole;
 use App\Http\Controllers\Concerns\ManagesEventAttributes;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\EventRequest;
 use App\Models\Category;
 use App\Models\Event;
-use App\Models\User;
 use App\Services\EventStatusService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -25,14 +23,18 @@ class EventController extends Controller
     {
         $this->authorize('viewAny', Event::class);
 
-        $query = Event::query()->with(['category', 'creator'])->withCount('ticketTypes');
+        $query = Event::query()
+            ->where('creator_id', auth()->id())
+            ->with(['category'])
+            ->withCount('ticketTypes');
+
         $this->applyEventFilters($query, $request);
 
         $events = $query->orderByDesc('start_datetime')->paginate(12)->withQueryString();
 
-        return view('admin.events.index', [
+        return view('creator.events.index', [
             'events' => $events,
-            'categories' => Category::orderBy('name')->get(),
+            'categories' => Category::where('is_active', true)->orderBy('name')->get(),
             'statuses' => EventStatus::cases(),
         ]);
     }
@@ -41,7 +43,10 @@ class EventController extends Controller
     {
         $this->authorize('create', Event::class);
 
-        return view('admin.events.create', $this->formData());
+        return view('creator.events.create', [
+            'categories' => Category::where('is_active', true)->orderBy('name')->get(),
+            'statuses' => EventStatus::cases(),
+        ]);
     }
 
     public function store(EventRequest $request): RedirectResponse
@@ -49,11 +54,14 @@ class EventController extends Controller
         $this->authorize('create', Event::class);
 
         $data = $this->eventPayload($request);
-        $data['creator_id'] = $request->integer('creator_id');
+        $data['creator_id'] = auth()->id();
+        if ($data['status'] === EventStatus::Published) {
+            // Creator can save as draft first; allow published if they choose
+        }
 
         $event = Event::create($data);
 
-        return redirect()->route('admin.events.show', $event)
+        return redirect()->route('creator.events.show', $event)
             ->with('success', 'Event berhasil dibuat.');
     }
 
@@ -61,16 +69,20 @@ class EventController extends Controller
     {
         $this->authorize('view', $event);
 
-        $event->load(['category', 'creator', 'ticketTypes']);
+        $event->load(['category', 'ticketTypes']);
 
-        return view('admin.events.show', compact('event'));
+        return view('creator.events.show', compact('event'));
     }
 
     public function edit(Event $event): View
     {
         $this->authorize('update', $event);
 
-        return view('admin.events.edit', array_merge(['event' => $event], $this->formData()));
+        return view('creator.events.edit', [
+            'event' => $event,
+            'categories' => Category::where('is_active', true)->orderBy('name')->get(),
+            'statuses' => EventStatus::cases(),
+        ]);
     }
 
     public function update(EventRequest $request, Event $event): RedirectResponse
@@ -79,11 +91,7 @@ class EventController extends Controller
 
         $event->update($this->eventPayload($request, $event));
 
-        if ($request->filled('creator_id')) {
-            $event->update(['creator_id' => $request->integer('creator_id')]);
-        }
-
-        return redirect()->route('admin.events.show', $event)
+        return redirect()->route('creator.events.show', $event)
             ->with('success', 'Event berhasil diperbarui.');
     }
 
@@ -93,7 +101,7 @@ class EventController extends Controller
 
         $event->delete();
 
-        return redirect()->route('admin.events.index')
+        return redirect()->route('creator.events.index')
             ->with('success', 'Event berhasil dihapus.');
     }
 
@@ -111,22 +119,5 @@ class EventController extends Controller
         $this->statusService->close($event);
 
         return back()->with('success', 'Event ditutup.');
-    }
-
-    public function cancel(Event $event): RedirectResponse
-    {
-        $this->authorize('manageStatus', $event);
-        $this->statusService->cancel($event);
-
-        return back()->with('success', 'Event dibatalkan.');
-    }
-
-    private function formData(): array
-    {
-        return [
-            'categories' => Category::where('is_active', true)->orderBy('name')->get(),
-            'creators' => User::where('role', UserRole::Creator)->where('is_active', true)->orderBy('name')->get(),
-            'statuses' => EventStatus::cases(),
-        ];
     }
 }
