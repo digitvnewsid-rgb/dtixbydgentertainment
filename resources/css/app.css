@@ -4,6 +4,290 @@
 @source '../../storage/framework/views/*.php';
 
 @theme {
+    /* Typography */
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
+    
+    /* Modern Color Palette - Inspired by Loket.com */
+    --color-primary-50: #f0f9ff;
+    --color-primary-100: #e0f2fe;
+    --color-primary-200: #bae6fd;
+    --color-primary-300: #7dd3fc;
+    --color-primary-400: #38bdf8;
+    --color-primary-500: #0ea5e9;
+    --color-primary-600: #0284c7;
+    --color-primary-700: #0369a1;
+    --color-primary-800: #075985;
+    --color-primary-900: #0c4a6e;
+    --color-primary-950: #082f49;
+    
+    --color-secondary-50: #fdf4ff;
+    --color-secondary-100: #fae8ff;
+    --color-secondary-200: #f5d0fe;
+    --color-secondary-300: #f0abfc;
+    --color-secondary-400: #e879f9;
+    --color-secondary-500: #d946ef;
+    --color-secondary-600: #c026d3;
+    --color-secondary-700: #a21caf;
+    --color-secondary-800: #86198f;
+    --color-secondary-900: #701a75;
+    
+    --color-accent-50: #fff7ed;
+    --color-accent-100: #ffedd5;
+    --color-accent-200: #fed7aa;
+    --color-accent-300: #fdba74;
+    --color-accent-400: #fb923c;
+    --color-accent-500: #f97316;
+    --color-accent-600: #ea580c;
+    --color-accent-700: #c2410c;
+    --color-accent-800: #9a3412;
+    --color-accent-900: #7c2d12;
+    
+    /* Shadows - Modern elevation */
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+    --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+    --shadow-colored: 0 10px 25px -5px rgb(14 165 233 / 0.2), 0 4px 6px -4px rgb(14 165 233 / 0.1);
+    
+    /* Animations */
+    --animate-spin: spin 1s linear infinite;
+    --animate-pulse: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    --animate-bounce: bounce 1s infinite;
+    --animate-fade-in: fadeIn 0.5s ease-in;
+    --animate-slide-up: slideUp 0.5s ease-out;
+}
+
+/* Custom Utilities */
+@layer utilities {
+    /* Smooth scrolling */
+    .scroll-smooth {
+        scroll-behavior: smooth;
+    }
+    
+    /* Backdrop blur effects */
+    .backdrop-blur-glass {
+        backdrop-filter: blur(12px) saturate(180%);
+        background-color: rgba(255, 255, 255, 0.8);
+    }
+    
+    .backdrop-blur-dark {
+        backdrop-filter: blur(12px) saturate(180%);
+        background-color: rgba(0, 0, 0, 0.5);
+    }
+    
+    /* Gradient text */
+    .gradient-text {
+        background: linear-gradient(135deg, var(--color-primary-600), var(--color-secondary-600));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    
+    /* Custom scrollbar */
+    .scrollbar-thin::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+    }
+    
+    .scrollbar-thin::-webkit-scrollbar-track {
+        background: #f1f5f9;
+        border-radius: 10px;
+    }
+    
+    .scrollbar-thin::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 10px;
+    }
+    
+    .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
+    }
+}
+
+/* Custom Components */
+@layer components {
+    /* Modern Button Styles */
+    .btn {
+        @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2;
+    }
+    
+    .btn-primary {
+        @apply btn bg-gradient-to-r from-primary-600 to-primary-700 text-white hover:from-primary-700 hover:to-primary-800 focus:ring-primary-500 shadow-md hover:shadow-lg hover:-translate-y-0.5;
+    }
+    
+    .btn-secondary {
+        @apply btn bg-white text-slate-700 border border-slate-300 hover:bg-slate-50 hover:border-slate-400 focus:ring-slate-500;
+    }
+    
+    .btn-accent {
+        @apply btn bg-gradient-to-r from-accent-500 to-accent-600 text-white hover:from-accent-600 hover:to-accent-700 focus:ring-accent-500 shadow-md hover:shadow-lg;
+    }
+    
+    .btn-ghost {
+        @apply btn text-slate-700 hover:bg-slate-100 focus:ring-slate-500;
+    }
+    
+    .btn-lg {
+        @apply px-6 py-3 text-base;
+    }
+    
+    .btn-sm {
+        @apply px-3 py-1.5 text-xs;
+    }
+    
+    /* Modern Card Styles */
+    .card {
+        @apply rounded-2xl bg-white shadow-md border border-slate-200/60 overflow-hidden transition-all duration-300;
+    }
+    
+    .card-hover {
+        @apply card hover:shadow-xl hover:-translate-y-1 hover:border-primary-200;
+    }
+    
+    .card-body {
+        @apply p-6;
+    }
+    
+    /* Badge Styles */
+    .badge {
+        @apply inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-medium;
+    }
+    
+    .badge-primary {
+        @apply badge bg-primary-100 text-primary-700;
+    }
+    
+    .badge-secondary {
+        @apply badge bg-secondary-100 text-secondary-700;
+    }
+    
+    .badge-accent {
+        @apply badge bg-accent-100 text-accent-700;
+    }
+    
+    .badge-success {
+        @apply badge bg-green-100 text-green-700;
+    }
+    
+    .badge-warning {
+        @apply badge bg-yellow-100 text-yellow-700;
+    }
+    
+    .badge-danger {
+        @apply badge bg-red-100 text-red-700;
+    }
+    
+    /* Input Styles */
+    .input {
+        @apply w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 placeholder-slate-400 transition-colors focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20;
+    }
+    
+    .input-error {
+        @apply border-red-500 focus:border-red-500 focus:ring-red-500/20;
+    }
+    
+    /* Navbar */
+    .navbar {
+        @apply sticky top-0 z-50 border-b border-slate-200/80 bg-white/80 backdrop-blur-lg transition-all duration-300;
+    }
+    
+    .navbar-shadow {
+        @apply shadow-md;
+    }
+    
+    /* Hero Section */
+    .hero-gradient {
+        @apply bg-gradient-to-br from-primary-600 via-primary-700 to-secondary-700;
+    }
+    
+    /* Event Card */
+    .event-card {
+        @apply card-hover cursor-pointer;
+    }
+    
+    .event-card-image {
+        @apply h-48 w-full object-cover bg-gradient-to-br from-primary-100 via-secondary-50 to-accent-100;
+    }
+    
+    /* Container */
+    .container-custom {
+        @apply mx-auto max-w-7xl px-4 sm:px-6 lg:px-8;
+    }
+}
+
+/* Keyframe Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes scaleIn {
+    from {
+        transform: scale(0.95);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* Animation Classes */
+.animate-fade-in {
+    animation: fadeIn 0.5s ease-in;
+}
+
+.animate-slide-up {
+    animation: slideUp 0.5s ease-out;
+}
+
+.animate-slide-down {
+    animation: slideDown 0.5s ease-out;
+}
+
+.animate-scale-in {
+    animation: scaleIn 0.3s ease-out;
+}
+
+/* Loading Skeleton */
+.skeleton {
+    @apply animate-pulse bg-slate-200 rounded;
+}
+
+/* Smooth transitions for all interactive elements */
+* {
+    @apply transition-colors duration-200;
+}
+
+button, a, input, select, textarea {
+    @apply transition-all duration-200;
 }
